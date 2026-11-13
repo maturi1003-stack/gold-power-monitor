@@ -1,1 +1,48 @@
 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GOLD POWER</title>
+<style>
+body{background:#101827;color:white;font-family:sans-serif;text-align:center;padding:20px}
+h1{color:#f5c542}
+.panel{background:#202d40;border-radius:18px;padding:22px;margin:20px 0}
+.big{font-size:36px;font-weight:bold}
+.buy{color:#36d399}
+.sell{color:#ff6b6b}
+button{background:#f5c542;color:#111;border:0;padding:18px;border-radius:12px;font-size:18px;width:100%}
+small{color:#aaa}
+</style>
+</head>
+<body>
+<h1>GOLD POWER</h1>
+<p>XAU/USD 売買パワー分析</p>
+<div class="panel">
+<h2>現在の価格</h2>
+<div class="big" id="price">未接続</div>
+</div>
+<div class="panel">
+<h2>1分足 売買パワー</h2>
+<p class="buy">買い <span id="buy">--</span>%</p>
+<p class="sell">売り <span id="sell">--</span>%</p>
+<h2 id="signal">データ待機中</h2>
+</div>
+<div class="panel">
+<h2>5分足 方向確認</h2>
+<div id="trend">未判定</div>
+</div>
+<button onclick="update()">今すぐ更新</button>
+<p id="status">市場データ未接続</p>
+<small>実データ接続後に分析が有効になります</small>
+<script>
+function update(){
+document.getElementById("status").textContent=
+"更新ボタンは正常です。市場データ接続が必要です。";
+alert("ボタンは正常に動作しています");
+}
+</script>
+</body>
+</html>
+
