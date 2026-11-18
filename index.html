@@ -6,16 +6,48 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GOLD POWER</title>
 <style>
-body{background:#101827;color:white;font-family:Arial,sans-serif;padding:15px;margin:0}
-h1{text-align:center;color:#f5c542}
-p{text-align:center;color:#bbb}
-.panel{background:#202c40;padding:12px;border-radius:15px;margin:15px 0}
-h2{font-size:18px}
+*{box-sizing:border-box}
+body{
+ background:#101827;color:white;
+ font-family:Arial,sans-serif;
+ padding:15px;margin:0
+}
+h1{text-align:center;color:#f5c542;margin-bottom:5px}
+.subtitle{text-align:center;color:#aab5c5;font-size:13px}
+.panel{
+ background:#202c40;padding:15px;
+ border-radius:15px;margin:15px 0
+}
+h2{font-size:18px;margin-top:0}
+.small{font-size:12px;color:#aab5c5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select{
+ width:100%;padding:12px;
+ background:#101827;color:white;
+ border:1px solid #50617a;
+ border-radius:8px;font-size:16px
+}
+label{display:block;margin:10px 0 5px;font-size:13px}
+button{
+ background:#f5c542;color:#101827;
+ border:0;border-radius:10px;
+ padding:13px;width:100%;
+ font-size:16px;font-weight:bold;
+ margin-top:12px
+}
+.bar{display:flex;height:24px;border-radius:12px;overflow:hidden;background:#50617a}
+.buy{background:#13b981;width:50%}
+.sell{background:#ef5350;width:50%}
+.numbers{display:flex;justify-content:space-between;margin:10px 0;font-weight:bold}
+.result{text-align:center;font-size:23px;font-weight:bold;margin:15px 0}
+.value{font-size:18px;font-weight:bold;color:#f5c542}
+.warning{color:#ffb86c}
 </style>
 </head>
 <body>
+
 <h1>GOLD POWER</h1>
-<p>OANDA XAU/USD 市場分析</p>
+<p class="subtitle">OANDA XAU/USD 市場分析</p>
 
 <div class="panel">
 <h2>現在の金価格</h2>
@@ -23,11 +55,11 @@ h2{font-size:18px}
 <div class="tradingview-widget-container__widget"></div>
 <script src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
 {
-"symbol":"OANDA:XAUUSD",
-"width":"100%",
-"locale":"ja",
-"colorTheme":"dark",
-"isTransparent":true
+ "symbol":"OANDA:XAUUSD",
+ "width":"100%",
+ "locale":"ja",
+ "colorTheme":"dark",
+ "isTransparent":true
 }
 </script>
 </div>
@@ -39,14 +71,14 @@ h2{font-size:18px}
 <div class="tradingview-widget-container__widget"></div>
 <script src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
 {
-"interval":"1m",
-"width":"100%",
-"height":400,
-"symbol":"OANDA:XAUUSD",
-"displayMode":"single",
-"locale":"ja",
-"colorTheme":"dark",
-"showIntervalTabs":false
+ "interval":"1m",
+ "width":"100%",
+ "height":400,
+ "symbol":"OANDA:XAUUSD",
+ "displayMode":"single",
+ "locale":"ja",
+ "colorTheme":"dark",
+ "showIntervalTabs":false
 }
 </script>
 </div>
@@ -58,18 +90,165 @@ h2{font-size:18px}
 <div class="tradingview-widget-container__widget"></div>
 <script src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
 {
-"interval":"5m",
-"width":"100%",
-"height":400,
-"symbol":"OANDA:XAUUSD",
-"displayMode":"single",
-"locale":"ja",
-"colorTheme":"dark",
-"showIntervalTabs":false
+ "interval":"5m",
+ "width":"100%",
+ "height":400,
+ "symbol":"OANDA:XAUUSD",
+ "displayMode":"single",
+ "locale":"ja",
+ "colorTheme":"dark",
+ "showIntervalTabs":false
 }
 </script>
 </div>
 </div>
-<p>分析提供: TradingView</p>
+
+<div class="panel">
+<h2>売買パワー計算</h2>
+<p class="small">
+TradingViewの1分足分析に表示される
+「買い」「売り」の件数を入力してください。
+中立は除外して比率を計算します。
+</p>
+<div class="grid">
+<div>
+<label>買い件数</label>
+<input id="buyCount" type="number" min="0" step="1" placeholder="例: 12">
+</div>
+<div>
+<label>売り件数</label>
+<input id="sellCount" type="number" min="0" step="1" placeholder="例: 4">
+</div>
+</div>
+
+<label>5分足の総合判定</label>
+<select id="trend">
+<option value="">選択してください</option>
+<option value="buy">買い優勢</option>
+<option value="neutral">中立</option>
+<option value="sell">売り優勢</option>
+</select>
+
+<label>現在価格（USD）</label>
+<input id="price" type="number" min="0" step="any"
+placeholder="TradingViewの価格を入力">
+
+<label>損切り幅（USD）</label>
+<input id="risk" type="number" min="0" step="any"
+placeholder="例: 5">
+
+<button onclick="calculate()">売買パワーを分析</button>
+
+<div class="numbers">
+<span id="buyText">買い --%</span>
+<span id="sellText">売り --%</span>
+</div>
+<div class="bar">
+<div class="buy" id="buyBar"></div>
+<div class="sell" id="sellBar"></div>
+</div>
+
+<div class="result" id="signal">未分析</div>
+<p id="reason" class="small"></p>
+
+<div class="grid">
+<div>
+<div class="small">エントリー参考価格</div>
+<div class="value" id="entry">--</div>
+</div>
+<div>
+<div class="small">損切り参考価格</div>
+<div class="value" id="sl">--</div>
+</div>
+<div>
+<div class="small">利確参考価格</div>
+<div class="value" id="tp">--</div>
+</div>
+<div>
+<div class="small">分析時刻</div>
+<div id="updated">--</div>
+</div>
+</div>
+
+<p class="small warning">
+※買い・売り比率は入力件数から計算した指標で、
+実際の注文量や勝率ではありません。
+価格目安は入力した損切り幅と
+リスクリワード比1:2による参考計算です。
+</p>
+</div>
+
+<p class="subtitle">分析提供: TradingView</p>
+
+<script>
+function calculate(){
+ const b=Number(document.getElementById("buyCount").value);
+ const s=Number(document.getElementById("sellCount").value);
+ const bRaw=document.getElementById("buyCount").value;
+ const sRaw=document.getElementById("sellCount").value;
+ const trend=document.getElementById("trend").value;
+ const price=Number(document.getElementById("price").value);
+ const risk=Number(document.getElementById("risk").value);
+
+ if(bRaw==="" || sRaw==="" ||
+ !Number.isInteger(b) || !Number.isInteger(s) ||
+ b<0 || s<0 || b+s===0){
+  alert("買い・売り件数を正しく入力してください");
+  return;
+ }
+
+ const bp=Math.round(b/(b+s)*100);
+ const sp=100-bp;
+
+ document.getElementById("buyText").textContent="買い "+bp+"%";
+ document.getElementById("sellText").textContent="売り "+sp+"%";
+ document.getElementById("buyBar").style.width=bp+"%";
+ document.getElementById("sellBar").style.width=sp+"%";
+
+ let signal="見送り";
+ let direction="";
+ let reason="1分足と5分足の方向が一致していません";
+
+ if(bp>=70 && trend==="buy"){
+  signal="買い候補";
+  direction="buy";
+  reason="1分足の買い比率70%以上・5分足買い優勢";
+ }else if(sp>=70 && trend==="sell"){
+  signal="売り候補";
+  direction="sell";
+  reason="1分足の売り比率70%以上・5分足売り優勢";
+ }
+
+ document.getElementById("signal").textContent=signal;
+ document.getElementById("reason").textContent=reason;
+
+ const entry=document.getElementById("entry");
+ const sl=document.getElementById("sl");
+ const tp=document.getElementById("tp");
+
+ entry.textContent="--";
+ sl.textContent="--";
+ tp.textContent="--";
+
+ const priceRaw=document.getElementById("price").value;
+ const riskRaw=document.getElementById("risk").value;
+
+ if(direction && priceRaw!=="" && riskRaw!=="" &&
+ Number.isFinite(price) && Number.isFinite(risk) &&
+ price>0 && risk>0){
+  entry.textContent=price.toFixed(2);
+  if(direction==="buy"){
+   sl.textContent=(price-risk).toFixed(2);
+   tp.textContent=(price+risk*2).toFixed(2);
+  }else{
+   sl.textContent=(price+risk).toFixed(2);
+   tp.textContent=(price-risk*2).toFixed(2);
+  }
+ }
+
+ document.getElementById("updated").textContent=
+ new Date().toLocaleString("ja-JP");
+}
+</script>
 </body>
 </html>
